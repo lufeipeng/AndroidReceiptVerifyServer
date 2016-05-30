@@ -2,15 +2,17 @@ package models
 
 import (
 	"time"
+
+	"github.com/astaxie/beego/config"
+
+	_ "github.com/go-sql-driver/mysql" // import your used driver
 	"os"
 	"path/filepath"
-	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego"
-	_ "github.com/go-sql-driver/mysql" // import your used driver
 	"github.com/astaxie/beego/orm"
 )
 
-var iniconf config.ConfigContainer
+var iniconf config.Configer
 
 func init() {
 	var err error
@@ -26,16 +28,18 @@ func init() {
 		beego.Error("channel.conf init is failed")
 	}
 	
-	orm.RegisterDriver("mysql", orm.DR_MySQL)
+	orm.RegisterDriver("mysql", orm.DRMySQL)
+	
+	beego.Error("channel.conf init is failed", iniconf.String("BILLDB"))
 	
 	// set default database	
     orm.RegisterDataBase("default", "mysql", iniconf.String("BILLDB"), 30)
     
-    // register model
-  	//  orm.RegisterModel(new(BillingHistory2))
+     //register model
+  	 // orm.RegisterModel(new(BillingHistory2))
 
-    // create table
-    //orm.RunSyncdb("default", false, true)
+     //create table
+     // orm.RunSyncdb("default", false, true)
 }
     
 type BillingHistory2 struct {

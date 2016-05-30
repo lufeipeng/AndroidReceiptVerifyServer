@@ -10,13 +10,9 @@ type ChinaMobileLoginController struct {
 }
 
 //Channel mobile Login
-//
 func (this *ChinaMobileLoginController) Get() {
 	beego.Debug("ChinaMobile login is called");
 	
-	if(models.ProcChinaMobileLoginCallback(this.Ctx.Input)) {
-		this.Ctx.WriteString("1");	
-	} else {
-		this.Ctx.WriteString("0");
-	}
+	models.ProcChinaMobileLoginCallback(this.Ctx.Input)
+	this.Ctx.WriteString("0");
 }

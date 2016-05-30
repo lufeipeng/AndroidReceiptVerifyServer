@@ -10,6 +10,7 @@ import (
 	//"time"
 	//"strconv"
 	"encoding/xml"
+	"io/ioutil"
 )
 
 func init() {
@@ -35,17 +36,31 @@ type BillRequest struct {
     PackageId   string   `xml:"packageID"`
 }
 
-func ProcChinaMobileBillingCallback(input *context.BeegoInput) bool {
+type BillResponse struct {
+	XMLName xml.Name `xml:"response"`
+	Hret    string `xml:"hRet"`
+	Message string `xml:"message"`
+}
+
+func ProcChinaMobileBillingCallback(input *context.BeegoInput) string {
+	var billResponse BillResponse
+	billResponse.Hret  = "1";
+	billResponse.Message  = "failure";
+		
     request := BillRequest{}
-    data := input.CopyBody();
+    data := input.CopyBody(1024);
     err := xml.Unmarshal(data, &request)
     if err != nil {
-        beego.Error("ProcChinaMobileBillingCallback para xml is error", data)
-        return false;
+        beego.Error("ProcChinaMobileBillingCallback para xml is error", string(data[:]))
+        resultBytes, _ := xml.MarshalIndent(billResponse, "  ", "  ");
+		return string(resultBytes);
     }
+    billResponse.Hret  = "0";
+	billResponse.Message  = "successful";
+	
     beego.Debug("ProcChinaMobileBillingCallback para xml is ", string(data[:]))
-    //TODO
-	return true;
+	resultBytes, _ := xml.MarshalIndent(billResponse, "  ", "  ");
+	return string(resultBytes);
 }
 
 func ValidLoginCallback(input *context.BeegoInput) bool {
@@ -58,7 +73,8 @@ func ValidLoginCallback(input *context.BeegoInput) bool {
 			beego.Debug("ValidLoginCallback,key:" + paramKey + " value:" + value)
 		}
 	}
-	beego.Debug("ValidLoginCallback,success")
+	resultBytes, _ := ioutil.ReadAll(input.Context.Request.Body)
+	beego.Debug("ValidLoginCallback,success", string(resultBytes));
 	return true
 }
 

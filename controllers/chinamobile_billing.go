@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/lufeipeng/AndroidReceiptVerifyServer/models"
+	"encoding/xml"
 )
 
 type ChinaMobileBillingController struct {
@@ -13,9 +14,7 @@ type ChinaMobileBillingController struct {
 func (this *ChinaMobileBillingController) Post() {
 	beego.Debug("ChinaMobile is called");
 	
-	if(models.ProcChinaMobileBillingCallback(this.Ctx.Input)) {
-		this.Ctx.WriteString("ok");	
-	} else {
-		this.Ctx.WriteString("fail");
-	}
+	resultStr := models.ProcChinaMobileBillingCallback(this.Ctx.Input);
+	this.Ctx.WriteString(xml.Header);	
+	this.Ctx.WriteString(resultStr);
 }
